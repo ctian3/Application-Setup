@@ -1,13 +1,35 @@
-<?php
-
-print "Hello World!";
-
-?>
-
+<?php session_start(); ?>
 <html>
-<head><title>Best Page Ever</title>
+<head><title>Hello app</title>
 </head>
 <body>
-Hello <?print "World"; ?>
+
+<!-- The data encoding type, enctype, MUST be specified as below -->
+<form enctype="multipart/form-data" action="result.php" method="POST">
+    <!-- MAX_FILE_SIZE must precede the file input field -->
+    <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
+    <!-- Name of input element determines name in $_FILES array -->
+    Send this file: <input name="userfile" type="file" /><br />
+Enter User Name: <input type="uname" name="uname"><br />
+Enter Email of user: <input type="email" name="useremail"><br />
+Enter Phone of user (1-XXX-XXX-XXXX): <input type="phone" name="phone"><br />
+Enter Autoincrement ID: <input type="id" name="id"><br />
+Enter File name: <input type="filename" name="filename"><br />
+Enter Raw S3 URL: <input type="s3rawurl" name="s3rawurl"><br />
+Enter Finished S3 URL URL: <input type="s3finishedurl" name="s3finishedurl"><br />
+Enter Status (0 for pending, 1 for finished, 2 for error): <input type="status" name="status">
+
+
+<input type="submit" value="Send File" />
+</form>
+<hr />
+<!-- The data encoding type, enctype, MUST be specified as below -->
+<form enctype="multipart/form-data" action="gallery.php" method="POST">
+
+Enter Email of user for gallery to browse: <input type="email" name="email">
+<input type="submit" value="Load Gallery" />
+</form>
+
+
 </body>
 </html>
