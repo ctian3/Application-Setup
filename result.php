@@ -4,6 +4,11 @@ session_start();
 //echo $_FILES;
 echo $_POST['useremail'];
 echo $_POST['phone'];
+echo $_POST['uname'];
+echo $_POST['filename'];
+
+
+
 $uploaddir='/tmp/';
 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 echo '<pre>';
@@ -79,6 +84,19 @@ if(!$stmt->execute()){
 }
 printf("%d Row inserted.\n", $stmt->affected_rows);
 $stmt->close();
+
+$result = $client->subscribe([
+    'Endpoint' => '<$phone>',
+    'Protocol' => '<sms>', // REQUIRED
+    'TopicArn' => '<arn:aws:sns:us-east-1:343582342076:mp2>', // REQUIRED
+]);
+
+echo "You will receive an confirm message on phone, Click 'Next' after you confim."
+
+<form>
+<input type="Publish" value="Publish">
+</form action="publish.php">
+
 $link->real_query("SELECT * FROM items");
 $res = $link->use_result();
 echo "Result set order...\n";
@@ -87,6 +105,9 @@ while ($row = $res->fetch_assoc()){
 }
 $link->close();
 ?>
+
+
+
 
 
 
