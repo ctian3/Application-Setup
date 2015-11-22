@@ -9,12 +9,13 @@ $client = RdsClient::factory(array(
 ));
 
 
-#$result = $client->describeDBInstances(array(
-#    'DBInstanceIdentifier' => 'itmo544jrhdb',
-#));
+$result = $client->describeDBInstances(array(
+    'DBInstanceIdentifier' => 'ctian-db',
+));
 
 
-#$endpoint = ""; 
+$endpoint = $result['DBInstances'][0]['Endpoint']['Address'];
+print "=====================\n". $endpoint . "============\n"; 
 
 
 #foreach ($result->getPath('DBInstances/*/Endpoint/Address') as $ep) {
@@ -26,7 +27,7 @@ $client = RdsClient::factory(array(
 
 
 echo "begin database";
-$link = mysqli_connect("ctian-db.cpgbrg85ofge.us-east-1.rds.amazonaws.com","controller","letmein88","ctiandb") or die("Error " . mysqli_error($link));
+$link = mysqli_connect($endpoint,"controller","letmein88","ctiandb") or die("Error " . mysqli_error($link));
 
 /* check connection */
 if (mysqli_connect_errno()) {
