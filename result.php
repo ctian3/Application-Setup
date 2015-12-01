@@ -43,34 +43,28 @@ $client = RdsClient::factory(array(
 'region' => 'us-east-1'
 ));
 $result = $client->describeDBInstances(array(
-      'DBInstanceIdentifier'=>'itmo544-ght-db',
+      'DBInstanceIdentifier'=>'ctian-db',
 ));
-$endpoint = $result['DBInstance'][0]['Endpoint']['Address'];
+$endpoint = $result['DBInstances'][0]['Endpoint']['Address'];
 print "===========\n". $endpoint . "===========\n";
-//foreach ($result->getPath('DBInstances/*/Endpoint/Address')as $ep){
-        //do something with the meessage
-//      echo "==========". $ep ."========";
-//      $endpoint = $ep;
-//}
-echo "Datebase Created"
+
+
+echo "Datebase Created";
 
 $link = mysqli_connect($endpoint,"controller","letmein88","ctiandb") or die("Error " . mysqli_error($link));
 if (mysqli_connect_errno()) {
     printf("Connect failed: %s\n", mysqli_connect_error());
     exit();
 }
-//check connection
-//if (mysqli_connect_error()){
-//      printf("Connect failed: %s\n",mysqli_connect_error());
-//      exit();0
-//}
-//prepared statement, stage1:prepare
+ 
+
+
 if (!($stmt = $link->prepare("INSERT INTO items (id, email,phone,filename,s3rawurl,s3finishedurl,status,issubscribed) VALUES (NULL,?,?,?,?,?,?,?)"))) {
     echo "Prepare failed: (" . $link->errno . ") " . $link->error;
 }
 $email = $_POST['useremail'];
 $phone = $_POST['phone'];
-$s3rawurl = $s3rawurl;//;from above
+$s3rawurl =$url; //$s3rawurl;//;from above
 $filename = basename($_FILES['userfile']['name']);
 $s3finishedurl = "none";
 $status=0;
