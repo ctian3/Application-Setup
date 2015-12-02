@@ -17,34 +17,33 @@ $client = RdsClient::factory(array(
 'version' =>'latest',
 'region'  => 'us-east-1'
 ));
-//$result = $client->describeDBInstances(array(
-  //  'DBInstanceIdentifier' => 'itmo544jrhdb',
-//));
-//$endpoint = "";
-//foreach ($result->getPath('DBInstances/*/Endpoint/Address') as $ep) {
-    // Do something with the message
-  //  echo "============". $ep . "================";
-    //$endpoint = $ep;
-   
-//echo "begin database";
-//$link = mysqli_connect($endpoint,"controller","ilovebunnies","itmo544db") or die("Error " . mysqli_error($link));
-/* check connection */
-//if (mysqli_connect_errno()) {
-  //  printf("Connect failed: %s\n", mysqli_connect_error());
-    //exit();
-//}
-$link = mysqli_connect("ctian-db.cpgbrg85ofge.us-east-1.rds.amazonaws.com","controller","letmein88","ctiandb") or die("Error " . mysqli_error($link));
-/* check connection */
+
+
+$result = $client->describeDBInstances(array(
+    'DBInstanceIdentifier' => 'ctian-db',
+));
+$endpoint = $result['DBInstances'][0]['Endpoint']['Address'];
+print "============\n". $endpoint . "================\n";
+
+
+echo "begin database";
+
+$link = mysqli_connect($endpoint,"controller","letmein88","ctiandb") or die("Error " . mysqli_error($link));
+
 if (mysqli_connect_errno()) {
     printf("Connect failed: %s\n", mysqli_connect_error());
     exit();
 }
+
 //below line is unsafe - $email is not checked for SQL injection -- don't do this in real life or use an ORM instead
 $link->real_query("SELECT * FROM items WHERE email = '$email'");
-//$link->real_query("SELECT * FROM items");
+
+
 $res = $link->use_result();
 echo "Result set order...\n";
+
 while ($row = $res->fetch_assoc()) {
+
     echo "<img src =\" " . $row['s3rawurl'] . "\" /><img src =\"" .$row['s3finishedurl'] . "\"/>";
 echo $row['id'] . "Email: " . $row['email'];
 }

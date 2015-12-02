@@ -28,7 +28,10 @@ if (mysqli_connect_errno()) {
     exit();
 }
 
-$create_table = 'CREATE TABLE IF NOT EXISTS items  
+//$delete_table = 'DELETE TABLE items';
+//$del_tbl = $link->query($delete_table);
+
+$create_table = 'CREATE TABLE items  
 (
     id INT NOT NULL AUTO_INCREMENT,
     email VARCHAR(200) NOT NULL,
@@ -37,7 +40,7 @@ $create_table = 'CREATE TABLE IF NOT EXISTS items
     filename VARCHAR(255) NOT NULL,
     s3finishedurl VARCHAR(255) NOT NULL,
     status INT NOT NULL,
-    issubscribed INT,
+    issubscribed INT
 )';
 
 
