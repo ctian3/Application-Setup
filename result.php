@@ -59,17 +59,17 @@ if (mysqli_connect_errno()) {
  
 
 
-if (!($stmt = $link->prepare("INSERT INTO items (id, email,phone,filename,s3rawurl,s3finishedurl,status,issubscribed) VALUES (NULL,?,?,?,?,?,?,?)"))) {
+if (!($stmt = $link->prepare("INSERT INTO items (id, email,phone,s3rawurl,filename,s3finishedurl,status,issubscribed) VALUES (NULL,?,?,?,?,?,?,?)"))) {
     echo "Prepare failed: (" . $link->errno . ") " . $link->error;
 }
 $email = $_POST['useremail'];
 $phone = $_POST['phone'];
-$s3rawurl =$url; //$s3rawurl;//;from above
+$s3rawurl = $url;//;from above
 $filename = basename($_FILES['userfile']['name']);
 $s3finishedurl = "none";
 $status=0;
 $issubscribed=0;
-$stmt->bind_param("sssssii",$email,$phone,$filename,$s3rawurl,$s3finishedurl,$status,$issubscribed);
+$stmt->bind_param("sssssii",$email,$phone,$s3rawurl,$filename,$s3finishedurl,$status,$issubscribed);
 if(!$stmt->execute()){
         echo "Execute failed:(" . $stmt->errno . ")" . $stmt->error;
 }
@@ -85,6 +85,20 @@ while ($row = $res->fetch_assoc()){
         echo $row['id'] . " " .$row['email']. " " .$row['phone'];
 }
 $link->close();
+use Aws\Sns\SnsClient;
+
+$client = SnsClient::factory(array(
+        'version' =>'latest',
+        'region'  => 'us-east-1'
+            ));
+
+$result = $client->subscribe([
+    'Endpoint' => $phone,
+    'Protocol' => 'sms', 
+    'TopicArn' => 'arn:aws:sns:us-east-1:343582342076:mp2'
+]);
+
+
 ?>
 
 
