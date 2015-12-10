@@ -1,105 +1,74 @@
 <?php
-//start the session
-session_start();
-//echo $_FILES;
-echo $_POST['useremail'];
-echo $_POST['phone'];
 
-$uploaddir='/tmp/';
-$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
-echo '<pre>';
-if(move_uploaded_file($_FILES['userfile']['tmp_name'],$uploadfile)){
-        echo "File is calid, and was successfully uploaded.\n";
-}else{
-        echo "Possible file upload attack!\n";
-}
-echo 'Here is some more debugging info:';
-print_r($_FILES);
-print "</pre>";
 require 'vendor/autoload.php';
-use Aws\S3\S3Client;
-$client = S3Client::factory(array(
-'version' =>'latest',
-'region'  => 'us-east-1'
-));
-$bucket = uniqid("php-ctian-",false);
-$result = $client->createBucket(array(
-        'Bucket'=> $bucket
-));
-$client->waitUntil('BucketExists', array('Bucket' => $bucket));
-//$client->waitUntilBucketExists(array('Bucket' => $bucket));
-$key = $uploadfile;
-$result = $client->putObject(array(
-        'ACL'=>'public-read',
-        'Bucket'=>$bucket,
-        'Key' =>$key,
-        'SourceFile'=>$uploadfile
-));
-$url = $result['ObjectURL'];
-echo $url;
+
 use Aws\Rds\RdsClient;
 $client = RdsClient::factory(array(
-'version' =>'latest',
-'region' => 'us-east-1'
+'version' => 'latest',
+'region'  => 'us-east-1'
 ));
+
+
 $result = $client->describeDBInstances(array(
-      'DBInstanceIdentifier'=>'ctian-db',
+    'DBInstanceIdentifier' => 'ctian-db',
 ));
+
+
 $endpoint = $result['DBInstances'][0]['Endpoint']['Address'];
-print "===========\n". $endpoint . "===========\n";
+print "=====================\n". $endpoint . "============\n"; 
+
+$endpoint= "";
+foreach ($result["DBInstances"] as $dbinstances){
+$dbinstanceidentifier = $ $dbinstances["DBInstanceIdentifier"];
+if ($dbinstanceidentifier == "ctian-db"){
+$endpoint = $dbinstances["Endpoint"]["Address"];
+}
+}
 
 
-echo "Datebase Created";
 
-$link = mysqli_connect($endpoint,"controller","letmein88","ctiandb") or die("Error " . mysqli_error($link));
+echo "begin database";
+$link = mysqli_connect($endpoint,"controller","letmein88") or die("Error " . mysqli_error($link));
+$db = "CREATE SCHEMA `ctiandb`;";
+$link->query($db);
+
 if (mysqli_connect_errno()) {
     printf("Connect failed: %s\n", mysqli_connect_error());
     exit();
 }
- 
+
+$delete_table = 'DELETE TABLE items';
+$del_tbl = $link->query($delete_table);
+
+$create_table = 'CREATE TABLE items  
+(
+    id INT NOT NULL AUTO_INCREMENT,
+    email VARCHAR(200) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    s3rawurl VARCHAR(255) NOT NULL,
+    filename VARCHAR(255) NOT NULL,
+    s3finishedurl VARCHAR(255) NOT NULL,
+    status INT NOT NULL,
+    issubscribed INT
+)';
 
 
-if (!($stmt = $link->prepare("INSERT INTO items (id, email,phone,s3rawurl,filename,s3finishedurl,status,issubscribed) VALUES (NULL,?,?,?,?,?,?,?)"))) {
-    echo "Prepare failed: (" . $link->errno . ") " . $link->error;
+
+$create_tbl = $link->query($create_table);
+if ($create_table) {
+	echo "Table is created or No error returned.";
 }
-$email = $_POST['useremail'];
-$phone = $_POST['phone'];
-$s3rawurl = $url;//;from above
-$filename = basename($_FILES['userfile']['name']);
-$s3finishedurl = "none";
-$status=0;
-$issubscribed=0;
-$stmt->bind_param("sssssii",$email,$phone,$s3rawurl,$filename,$s3finishedurl,$status,$issubscribed);
-if(!$stmt->execute()){
-        echo "Execute failed:(" . $stmt->errno . ")" . $stmt->error;
-}
-printf("%d Row inserted.\n", $stmt->affected_rows);
-$stmt->close();
-
-
-
-$link->real_query("SELECT * FROM items");
-$res = $link->use_result();
-echo "Result set order...\n";
-while ($row = $res->fetch_assoc()){
-        echo $row['id'] . " " .$row['email']. " " .$row['phone'];
+else {
+        echo "error!!";  
 }
 $link->close();
-use Aws\Sns\SnsClient;
-
-$client = SnsClient::factory(array(
-        'version' =>'latest',
-        'region'  => 'us-east-1'
-            ));
-
-$result = $client->subscribe([
-    'Endpoint' => $phone,
-    'Protocol' => 'sms', 
-    'TopicArn' => 'arn:aws:sns:us-east-1:343582342076:mp2'
-]);
-
-
 ?>
+
+<h1>File Upload</h1>
+<form action="index.php">
+<input type="submit" value="Submit">
+</form>
+
 
 
 
