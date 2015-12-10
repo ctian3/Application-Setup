@@ -17,19 +17,28 @@ $result = $client->describeDBInstances(array(
 $endpoint = $result['DBInstances'][0]['Endpoint']['Address'];
 print "=====================\n". $endpoint . "============\n"; 
 
+$endpoint= "";
+foreach ($result["DBInstances"] as $dbinstances){
+$dbinstanceidentifier = $ $dbinstances["DBInstanceIdentifier"];
+if ($dbinstanceidentifier == "ctian-db"){
+$endpoint = $dbinstances["Endpoint"]["Address"];
+}
+}
+
 
 
 echo "begin database";
-$link = mysqli_connect($endpoint,"controller","letmein88","ctiandb") or die("Error " . mysqli_error($link));
-
+$link = mysqli_connect($endpoint,"controller","letmein88") or die("Error " . mysqli_error($link));
+$db = "CREATE SCHEMA `ctiandb`;";
+$link->query($db);
 
 if (mysqli_connect_errno()) {
     printf("Connect failed: %s\n", mysqli_connect_error());
     exit();
 }
 
-//$delete_table = 'DELETE TABLE items';
-//$del_tbl = $link->query($delete_table);
+$delete_table = 'DELETE TABLE items';
+$del_tbl = $link->query($delete_table);
 
 $create_table = 'CREATE TABLE items  
 (
@@ -54,3 +63,8 @@ else {
 }
 $link->close();
 ?>
+
+<h1>File Upload</h1>
+<form action="index.php">
+<input type="submit" value="Submit">
+</form>
